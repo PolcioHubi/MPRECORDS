@@ -1,17 +1,16 @@
 #!/bin/bash
 
 #############################################
-#  MP RECORDS - Deploy Script
+#  MP RECORDS - Smart Deploy Script (Auto-Detect)
 #  
-#  Ten skrypt jest w repozytorium z projektem.
-#  
-#  PIERWSZA INSTALACJA (na świeżym VPS):
-#    1. Sklonuj repo: git clone URL /var/www/mprecords
-#    2. Uruchom: cd /var/www/mprecords && chmod +x deploy.sh && ./deploy.sh --setup
-#  
-#  AKTUALIZACJA:
-#    ./deploy.sh
+#  Ten skrypt:
+#  1. Sam wykrywa katalog, w którym go uruchamiasz.
+#  2. Sam czyści stare śmieci (błędne repozytoria, stare configi).
+#  3. Instaluje poprawną wersję MongoDB 8.0 dla Ubuntu 24.04.
 #
+#  UŻYCIE:
+#    chmod +x deploy.sh
+#    sudo ./deploy.sh --setup
 #############################################
 
 set -e
@@ -23,9 +22,11 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-# Ścieżka aplikacji
-APP_DIR="/var/www/mprecords"
+# 1. AUTO-DETEKCJA ŚCIEŻKI I UŻYTKOWNIKA
+# Skrypt pobiera ścieżkę do katalogu, w którym się znajduje
+APP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 APP_NAME="mprecords"
+CURRENT_USER=${SUDO_USER:-$USER}
 
 #############################################
 # FUNKCJE POMOCNICZE
@@ -39,9 +40,40 @@ log_error() { echo -e "${RED}❌ $1${NC}"; }
 check_root() {
     if [[ $EUID -ne 0 ]]; then
         log_error "Ten skrypt wymaga uprawnień root!"
-        log_info "Uruchom: sudo ./deploy.sh"
+        log_info "Uruchom: sudo ./deploy.sh --setup"
         exit 1
     fi
+}
+
+#############################################
+# AUTOMATYCZNE CZYSZCZENIE (Efekt Domino)
+#############################################
+
+cleanup_system() {
+    log_warning "🧹 Rozpoczynam czyszczenie starych plików i błędnych konfiguracji..."
+
+    # 1. Usuwanie błędnego repozytorium MongoDB 7.0 (Naprawa błędu 404)
+    if [ -f "/etc/apt/sources.list.d/mongodb-org-7.0.list" ]; then
+        log_info "Usuwam błędną listę repozytoriów MongoDB 7.0..."
+        rm -f /etc/apt/sources.list.d/mongodb-org-7.0.list
+    fi
+
+    # 2. Usuwanie starych konfliktów Nginx
+    rm -f /etc/nginx/sites-enabled/$APP_NAME
+    rm -f /etc/nginx/sites-available/$APP_NAME
+    rm -f /etc/nginx/sites-enabled/default # Usuwamy domyślną stronę, by nie blokowała portu 80
+
+    # 3. Czyszczenie starych procesów systemd
+    if [ -f "/etc/systemd/system/$APP_NAME.service" ]; then
+        log_info "Zatrzymuję stary serwis..."
+        systemctl stop $APP_NAME 2>/dev/null || true
+        systemctl disable $APP_NAME 2>/dev/null || true
+        rm -f /etc/systemd/system/$APP_NAME.service
+        systemctl daemon-reload
+    fi
+
+    # 4. Odświeżenie apt po czyszczeniu
+    apt update || log_warning "Apt update zgłosił błędy, ale próbujemy dalej..."
 }
 
 #############################################
@@ -49,9 +81,12 @@ check_root() {
 #############################################
 
 first_setup() {
-    log_info "🚀 PIERWSZA INSTALACJA MP RECORDS"
-    echo ""
+    log_info "🚀 ROZPOCZYNAM INSTALACJĘ W KATALOGU: $APP_DIR"
     
+    # Najpierw sprzątamy
+    cleanup_system
+    
+    echo ""
     # Zbierz dane
     read -p "🌐 Podaj domenę (np. mprecords.pl): " DOMAIN
     read -p "📧 Podaj email (do SSL): " EMAIL
@@ -59,12 +94,10 @@ first_setup() {
     read -sp "🔑 Hasło admina: " ADMIN_PASSWORD
     echo ""
     
-    # Generuj JWT secret
     JWT_SECRET=$(openssl rand -base64 32)
     
     echo ""
-    log_info "Rozpoczynam instalację..."
-    echo ""
+    log_info "Rozpoczynam konfigurację..."
 
     # 1. Aktualizacja systemu
     log_info "📦 Aktualizuję system..."
@@ -75,32 +108,28 @@ first_setup() {
     curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
     apt install -y nodejs
     
-    # 3. Instalacja MongoDB
-    log_info "📦 Instaluję MongoDB..."
-    curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
-    echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] http://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/7.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+    # 3. Instalacja MongoDB 8.0 (Specjalnie dla Ubuntu 24.04 Noble)
+    log_info "📦 Instaluję MongoDB 8.0 (Noble Fix)..."
+    curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg --dearmor --yes
+    echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] http://repo.mongodb.org/apt/ubuntu noble/mongodb-org/8.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-8.0.list
     apt update
     apt install -y mongodb-org
     systemctl start mongod
     systemctl enable mongod
     
-    # 4. Instalacja Nginx
-    log_info "📦 Instaluję Nginx..."
-    apt install -y nginx
+    # 4. Instalacja Nginx i Certbot
+    log_info "📦 Instaluję Nginx i Certbot..."
+    apt install -y nginx certbot python3-certbot-nginx
     
-    # 5. Instalacja Certbot
-    log_info "📦 Instaluję Certbot..."
-    apt install -y certbot python3-certbot-nginx
-    
-    # 6. Firewall
+    # 5. Firewall
     log_info "🔒 Konfiguruję firewall..."
     ufw allow 22
     ufw allow 80
     ufw allow 443
     ufw --force enable
     
-    # 7. Plik .env
-    log_info "⚙️ Tworzę plik .env..."
+    # 6. Plik .env
+    log_info "⚙️ Generuję plik .env..."
     cat > "$APP_DIR/.env" << ENVFILE
 PORT=5000
 NODE_ENV=production
@@ -111,18 +140,20 @@ ADMIN_PASSWORD=$ADMIN_PASSWORD
 ENVFILE
     chmod 600 "$APP_DIR/.env"
     
-    # 8. Instalacja zależności
-    log_info "📦 Instaluję zależności npm..."
+    # 7. Instalacja zależności
+    log_info "📦 Instaluję zależności npm w $APP_DIR..."
     cd "$APP_DIR"
     npm install --production
     
-    # 9. Folder uploads
+    # 8. Folder uploads i uprawnienia
     mkdir -p "$APP_DIR/server/uploads"/{wydania,produkty,czlonkowie}
-    chown -R www-data:www-data "$APP_DIR/server/uploads"
-    chmod -R 755 "$APP_DIR/server/uploads"
     
-    # 10. Systemd service
-    log_info "⚙️ Tworzę serwis systemd..."
+    # WAŻNE: Ustawiamy właściciela na www-data, ale dajemy dostęp grupie
+    chown -R www-data:www-data "$APP_DIR"
+    chmod -R 755 "$APP_DIR"
+    
+    # 9. Systemd service
+    log_info "⚙️ Tworzę serwis systemd (auto-path)..."
     cat > /etc/systemd/system/$APP_NAME.service << SERVICE
 [Unit]
 Description=MP Records Application
@@ -141,12 +172,11 @@ Environment=NODE_ENV=production
 WantedBy=multi-user.target
 SERVICE
     
-    chown -R www-data:www-data "$APP_DIR"
     systemctl daemon-reload
     systemctl enable $APP_NAME
     systemctl start $APP_NAME
     
-    # 11. Nginx config
+    # 10. Nginx config
     log_info "⚙️ Konfiguruję Nginx..."
     cat > /etc/nginx/sites-available/$APP_NAME << NGINX
 server {
@@ -176,31 +206,17 @@ server {
 NGINX
     
     ln -sf /etc/nginx/sites-available/$APP_NAME /etc/nginx/sites-enabled/
-    rm -f /etc/nginx/sites-enabled/default
     nginx -t && systemctl reload nginx
     
-    # 12. SSL
-    log_info "🔐 Konfiguruję HTTPS (Let's Encrypt)..."
-    certbot --nginx -d "$DOMAIN" -d "www.$DOMAIN" --non-interactive --agree-tos -m "$EMAIL"
-    
-    # Auto-renewal
-    systemctl enable certbot.timer
+    # 11. SSL
+    log_info "🔐 Konfiguruję HTTPS..."
+    # Sprawdź czy domena działa, jeśli nie - pomiń błąd, żeby nie wywalić skryptu na końcu
+    certbot --nginx -d "$DOMAIN" -d "www.$DOMAIN" --non-interactive --agree-tos -m "$EMAIL" || log_warning "Nie udało się wygenerować SSL. Upewnij się, że domena $DOMAIN wskazuje na ten serwer i uruchom: certbot --nginx"
     
     echo ""
-    echo "=========================================="
-    log_success "INSTALACJA ZAKOŃCZONA!"
-    echo "=========================================="
-    echo ""
-    echo "🌐 Strona:  https://$DOMAIN"
-    echo "🔧 Admin:   https://$DOMAIN/admin"
-    echo "👤 Login:   $ADMIN_LOGIN"
-    echo ""
-    echo "📝 Przydatne komendy:"
-    echo "   Status:    systemctl status $APP_NAME"
-    echo "   Logi:      journalctl -u $APP_NAME -f"
-    echo "   Restart:   systemctl restart $APP_NAME"
-    echo "   Update:    ./deploy.sh"
-    echo ""
+    log_success "✅ INSTALACJA ZAKOŃCZONA SUKCESEM!"
+    echo "📂 Aplikacja zainstalowana w: $APP_DIR"
+    echo "🌐 Strona: https://$DOMAIN"
 }
 
 #############################################
@@ -208,40 +224,20 @@ NGINX
 #############################################
 
 update_app() {
-    log_info "🔄 AKTUALIZACJA MP RECORDS"
-    echo ""
-    
+    log_info "🔄 AKTUALIZACJA MP RECORDS W: $APP_DIR"
     cd "$APP_DIR"
     
-    # Pobierz zmiany
-    log_info "📥 Pobieram zmiany z GitHub..."
+    log_info "📥 Pobieram zmiany..."
     git fetch origin
     git reset --hard origin/main 2>/dev/null || git reset --hard origin/master
     
-    # Zainstaluj zależności
     log_info "📦 Instaluję zależności..."
     npm install --production
+    chown -R www-data:www-data "$APP_DIR"
     
-    # Uprawnienia uploads
-    chown -R www-data:www-data "$APP_DIR/server/uploads" 2>/dev/null || true
-    
-    # Restart
-    log_info "🔄 Restartuję aplikację..."
+    log_info "🔄 Restartuję..."
     systemctl restart $APP_NAME
-    
-    # Sprawdź status
-    sleep 3
-    if systemctl is-active --quiet $APP_NAME; then
-        echo ""
-        log_success "Aktualizacja zakończona!"
-        echo ""
-        echo "📊 Wersja: $(git log -1 --format='%h - %s' 2>/dev/null || echo 'brak info')"
-        echo "📅 Data:   $(git log -1 --format='%ci' 2>/dev/null || echo 'brak info')"
-    else
-        log_error "Błąd! Sprawdź logi:"
-        echo "   journalctl -u $APP_NAME -n 50"
-    fi
-    echo ""
+    log_success "Gotowe!"
 }
 
 #############################################
@@ -250,32 +246,23 @@ update_app() {
 
 echo ""
 echo "╔═══════════════════════════════════════╗"
-echo "║       MP RECORDS - Deploy Script      ║"
+echo "║   MP RECORDS - Smart Deploy Script    ║"
 echo "╚═══════════════════════════════════════╝"
 echo ""
 
-# Sprawdź czy root
 check_root
 
-# Sprawdź parametry
 if [[ "$1" == "--setup" ]] || [[ "$1" == "-s" ]]; then
     first_setup
-elif [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-    echo "Użycie:"
-    echo "  ./deploy.sh --setup   Pierwsza instalacja na VPS"
-    echo "  ./deploy.sh           Aktualizacja aplikacji"
-    echo ""
 else
-    # Sprawdź czy to pierwsza instalacja czy aktualizacja
+    # Jeśli serwis nie istnieje, sugeruj setup
     if [[ ! -f "/etc/systemd/system/$APP_NAME.service" ]]; then
-        log_warning "Nie wykryto zainstalowanej aplikacji."
-        echo ""
-        read -p "Czy to pierwsza instalacja? (t/n): " FIRST_INSTALL
-        if [[ "$FIRST_INSTALL" == "t" ]] || [[ "$FIRST_INSTALL" == "T" ]]; then
+        log_warning "Nie wykryto zainstalowanej aplikacji w systemie."
+        read -p "Czy chcesz uruchomić pełną instalację (setup)? (t/n): " DO_SETUP
+        if [[ "$DO_SETUP" == "t" || "$DO_SETUP" == "T" ]]; then
             first_setup
         else
-            log_error "Uruchom z parametrem --setup dla pierwszej instalacji"
-            exit 1
+            exit 0
         fi
     else
         update_app
