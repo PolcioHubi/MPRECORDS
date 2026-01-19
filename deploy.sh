@@ -3,15 +3,8 @@
 #############################################
 #   MP RECORDS - Smart Deploy Script (Auto-Detect)
 #   
-#   Ten skrypt:
-#   1. Sam wykrywa katalog, w którym go uruchamiasz.
-#   2. Sam czyści stare śmieci (błędne repozytoria, stare configi).
-#   3. Instaluje poprawną wersję MongoDB 8.0 dla Ubuntu 24.04.
-#   4. AUTOMATYCZNIE TWORZY ADMINA W BAZIE (Fix błędu 500)
-#
-#   UŻYCIE:
-#     chmod +x deploy.sh
-#     sudo ./deploy.sh --setup
+#   NAPRAWIONO: Błąd cudzysłowów w Nginx
+#   NAPRAWIONO: Generowanie pliku .env
 #############################################
 
 set -e
@@ -26,7 +19,6 @@ NC='\033[0m'
 # 1. AUTO-DETEKCJA ŚCIEŻKI I UŻYTKOWNIKA
 APP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 APP_NAME="mprecords"
-CURRENT_USER=${SUDO_USER:-$USER}
 
 #############################################
 # FUNKCJE POMOCNICZE
@@ -45,24 +37,15 @@ check_root() {
     fi
 }
 
-#############################################
-# AUTOMATYCZNE CZYSZCZENIE
-#############################################
-
 cleanup_system() {
     log_warning "🧹 Rozpoczynam czyszczenie starych plików i błędnych konfiguracji..."
-
-    # 1. Usuwanie błędnego repozytorium MongoDB 7.0
     if [ -f "/etc/apt/sources.list.d/mongodb-org-7.0.list" ]; then
         rm -f /etc/apt/sources.list.d/mongodb-org-7.0.list
     fi
-
-    # 2. Usuwanie starych konfliktów Nginx
     rm -f /etc/nginx/sites-enabled/$APP_NAME
     rm -f /etc/nginx/sites-available/$APP_NAME
-    rm -f /etc/nginx/sites-enabled/default
-
-    # 3. Czyszczenie starych procesów systemd
+    rm -f /etc/nginx/sites-enabled/default || true
+    
     if [ -f "/etc/systemd/system/$APP_NAME.service" ]; then
         systemctl stop $APP_NAME 2>/dev/null || true
         systemctl disable $APP_NAME 2>/dev/null || true
@@ -72,11 +55,11 @@ cleanup_system() {
 }
 
 #############################################
-# PIERWSZA INSTALACJA
+# GŁÓWNA INSTALACJA
 #############################################
 
 first_setup() {
-    log_info "🚀 ROZPOCZYNAM INSTALACJĘ W KATALOGU: $APP_DIR"
+    log_info "🚀 ROZPOCZYNAM INSTALACJĘ W: $APP_DIR"
     
     cleanup_system
     
@@ -89,14 +72,18 @@ first_setup() {
     
     JWT_SECRET=$(openssl rand -base64 32)
     
-    log_info "📦 Aktualizacja i instalacja narzędzi..."
+    log_info "📦 Aktualizacja systemowa..."
     apt update && apt upgrade -y
     
     # 2. Node.js 20
-    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-    apt install -y nodejs
+    if ! command -v node &> /dev/null; then
+        log_info "🟢 Instaluję Node.js..."
+        curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+        apt install -y nodejs
+    fi
     
     # 3. MongoDB 8.0
+    log_info "🟢 Konfiguruję MongoDB 8.0..."
     curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg --dearmor --yes
     echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] http://repo.mongodb.org/apt/ubuntu noble/mongodb-org/8.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-8.0.list
     apt update
@@ -108,10 +95,12 @@ first_setup() {
     apt install -y nginx certbot python3-certbot-nginx
     
     # 5. Firewall
-    ufw allow 22 && ufw allow 80 && ufw allow 443 && ufw --force enable
+    ufw allow 22
+    ufw allow 80
+    ufw allow 443
+    ufw --force enable
     
-    # 6. Plik .env
-    log_info "⚙️ Generuję plik .env..."
+    # 6. .env
     cat > "$APP_DIR/.env" << ENVFILE
 PORT=5000
 NODE_ENV=production
@@ -122,8 +111,7 @@ ADMIN_PASSWORD=$ADMIN_PASSWORD
 ENVFILE
     chmod 600 "$APP_DIR/.env"
     
-    # 7. npm install
-    log_info "📦 Instaluję zależności npm..."
+    # 7. NPM
     cd "$APP_DIR"
     npm install --production
     
@@ -132,22 +120,19 @@ ENVFILE
     chown -R www-data:www-data "$APP_DIR"
     chmod -R 755 "$APP_DIR"
 
-    # 9. NOWOŚĆ: Dodanie admina bezpośrednio do MongoDB (Zapobiega błędowi 500)
-    log_info "👤 Tworzę admina w bazie danych..."
+    # 9. Tworzenie Admina
+    log_info "👤 Dodaję admina do MongoDB..."
     node -e "
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const login = '$ADMIN_LOGIN';
-const password = '$ADMIN_PASSWORD';
-
 mongoose.connect('mongodb://localhost:27017/mprecords').then(async () => {
     const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(password, salt);
+    const hash = await bcrypt.hash('$ADMIN_PASSWORD', salt);
     await mongoose.connection.db.collection('users').updateOne(
-        { login: login },
+        { login: '$ADMIN_LOGIN' },
         { \$set: { 
-            username: login, 
-            login: login, 
+            username: '$ADMIN_LOGIN', 
+            login: '$ADMIN_LOGIN', 
             password: hash, 
             role: 'admin', 
             isAdmin: true,
@@ -156,16 +141,13 @@ mongoose.connect('mongodb://localhost:27017/mprecords').then(async () => {
         }},
         { upsert: true }
     );
-    console.log('✅ Admin dodany do bazy.');
     process.exit(0);
-}).catch(err => { console.error(err); process.exit(1); });
-"
+}).catch(err => { console.error(err); process.exit(1); });"
     
-    # 10. Systemd service
-    log_info "⚙️ Tworzę serwis systemd..."
+    # 10. Systemd
     cat > /etc/systemd/system/$APP_NAME.service << SERVICE
 [Unit]
-Description=MP Records Application
+Description=MP Records App
 After=network.target mongod.service
 
 [Service]
@@ -174,7 +156,6 @@ User=www-data
 WorkingDirectory=$APP_DIR
 ExecStart=/usr/bin/node server/server.js
 Restart=on-failure
-RestartSec=10
 Environment=NODE_ENV=production
 
 [Install]
@@ -185,7 +166,7 @@ SERVICE
     systemctl enable $APP_NAME
     systemctl start $APP_NAME
     
-    # 11. Nginx config
+    # 11. NGINX (Naprawione cudzysłowy)
     log_info "⚙️ Konfiguruję Nginx..."
     cat > /etc/nginx/sites-available/$APP_NAME << NGINX
 server {
@@ -207,7 +188,7 @@ server {
     location /uploads {
         alias $APP_DIR/server/uploads;
         expires 30d;
-        add_header Cache-Control \"public, immutable\";
+        add_header Cache-Control "public";
     }
     
     client_max_body_size 100M;
@@ -215,38 +196,33 @@ server {
 NGINX
     
     ln -sf /etc/nginx/sites-available/$APP_NAME /etc/nginx/sites-enabled/
-    nginx -t && systemctl reload nginx
+    nginx -t
+    systemctl reload nginx
     
     # 12. SSL
-    log_info "🔐 Konfiguruję HTTPS..."
-    certbot --nginx -d "$DOMAIN" -d "www.$DOMAIN" --non-interactive --agree-tos -m "$EMAIL" || log_warning "Skonfiguruj SSL ręcznie: certbot --nginx"
+    log_info "🔐 Uzyskuję certyfikat SSL..."
+    certbot --nginx -d "$DOMAIN" -d "www.$DOMAIN" --non-interactive --agree-tos -m "$EMAIL" || log_warning "SSL nie powiódł się. Uruchom potem: certbot --nginx"
     
-    log_success "✅ INSTALACJA ZAKOŃCZONA!"
-    echo "🌐 Strona: https://$DOMAIN"
+    log_success "🚀 GOTOWE! Strona dostępna pod: https://$DOMAIN"
 }
 
 update_app() {
-    log_info "🔄 AKTUALIZACJA..."
+    log_info "🔄 Aktualizacja aplikacji..."
     cd "$APP_DIR"
-    git fetch origin
-    git reset --hard origin/main 2>/dev/null || git reset --hard origin/master
+    git pull origin main || git pull origin master
     npm install --production
     chown -R www-data:www-data "$APP_DIR"
     systemctl restart $APP_NAME
-    log_success "Gotowe!"
+    log_success "Zaktualizowano!"
 }
-
-echo "╔═══════════════════════════════════════╗"
-echo "║   MP RECORDS - Smart Deploy Script    ║"
-echo "╚═══════════════════════════════════════╝"
 
 check_root
 
-if [[ "$1" == "--setup" ]] || [[ "$1" == "-s" ]]; then
+if [[ "$1" == "--setup" ]]; then
     first_setup
 else
     if [[ ! -f "/etc/systemd/system/$APP_NAME.service" ]]; then
-        log_warning "Brak instalacji. Użyj: ./deploy.sh --setup"
+        log_error "Aplikacja nie jest zainstalowana. Użyj: sudo ./deploy.sh --setup"
     else
         update_app
     fi
