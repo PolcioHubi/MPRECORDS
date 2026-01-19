@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Koszyk - MP RECORDS</title>
+    <link rel="icon" href="/assets/image/favicon.svg" type="image/svg+xml">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/pages/common.css">
+    
+    <style>
+        .cart-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        
+        @media (min-width: 900px) {
+            .cart-container {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+        
+        .cart-title {
+            font-family: var(--font-minecraft);
+            font-size: 1rem;
+            color: var(--purple-light);
+            margin-bottom: 20px;
+            grid-column: 1 / -1;
+        }
+        
+        /* Cart Items */
+        .cart-items {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .cart-item {
+            display: grid;
+            grid-template-columns: 80px 1fr auto;
+            gap: 16px;
+            padding: 16px;
+            background: var(--black-lighter);
+            border-radius: 12px;
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            align-items: center;
+        }
+        
+        .cart-item-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .cart-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .cart-item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .cart-item-name {
+            font-weight: 600;
+            color: var(--white);
+        }
+        
+        .cart-item-size {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        .cart-item-price {
+            font-size: 1rem;
+            color: var(--purple-light);
+            font-weight: 600;
+        }
+        
+        .cart-item-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+        }
+        
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            background: rgba(0,0,0,0.3);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .qty-btn {
+            width: 30px;
+            height: 30px;
+            background: transparent;
+            border: none;
+            color: var(--white);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        
+        .qty-btn:hover {
+            background: var(--purple);
+        }
+        
+        .qty-value {
+            width: 30px;
+            text-align: center;
+            color: var(--white);
+        }
+        
+        .remove-btn {
+            background: none;
+            border: none;
+            color: #ef4444;
+            font-size: 0.8rem;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+        
+        .remove-btn:hover {
+            opacity: 1;
+        }
+        
+        /* Empty cart */
+        .empty-cart {
+            text-align: center;
+            padding: 60px 20px;
+            grid-column: 1 / -1;
+        }
+        
+        .empty-cart-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        .empty-cart p {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: var(--purple);
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: var(--purple-dark);
+        }
+        
+        /* Summary */
+        .cart-summary {
+            background: var(--black-lighter);
+            border-radius: 12px;
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            padding: 24px;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+        
+        .summary-title {
+            font-family: var(--font-minecraft);
+            font-size: 0.8rem;
+            color: var(--purple-light);
+            margin-bottom: 20px;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .summary-row:last-of-type {
+            border-bottom: none;
+        }
+        
+        .summary-row.total {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--white);
+            padding-top: 20px;
+            margin-top: 10px;
+            border-top: 2px solid var(--purple);
+        }
+        
+        .summary-label {
+            color: var(--gray);
+        }
+        
+        .summary-value {
+            color: var(--white);
+        }
+        
+        .free-shipping-note {
+            font-size: 0.8rem;
+            color: #22c55e;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .checkout-btn {
+            width: 100%;
+            padding: 16px;
+            margin-top: 20px;
+            background: var(--purple);
+            border: none;
+            border-radius: 8px;
+            color: var(--white);
+            font-family: var(--font-minecraft);
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .checkout-btn:hover {
+            background: var(--purple-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px var(--purple-glow);
+        }
+        
+        .checkout-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .continue-shopping {
+            display: block;
+            text-align: center;
+            margin-top: 16px;
+            color: var(--gray);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .continue-shopping:hover {
+            color: var(--purple-light);
+        }
+    </style>
+</head>
+<body>
+    <!-- Marquee Banner -->
+    <div class="marquee-banner" id="marqueeBanner" style="display: none;">
+        <div class="marquee-track">
+            <span id="marqueeText1"></span>
+            <span id="marqueeText2"></span>
+        </div>
+    </div>
+
+    <!-- Particles Canvas -->
+    <canvas id="particles-canvas"></canvas>
+    
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <a href="/" class="logo">
+                <span class="logo-dot"></span>
+                <span class="logo-text minecraft">MP RECORDS</span>
+            </a>
+            <nav class="nav">
+                <a href="/wydania">WYDANIA</a>
+                <a href="/sklep">SKLEP</a>
+                <a href="/kontakt">KONTAKT</a>
+                <a href="/czlonkowie">CZŁONKOWIE</a>
+                <a href="/koszyk" class="active cart-link">
+                    🛒 <span id="cartCount">0</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="page-hero" style="min-height: 200px;">
+        <div class="page-hero-bg" style="background-image: url('/assets/image/fajne zdjecie wo wyglud.jpg');"></div>
+        <div class="page-hero-overlay"></div>
+        <div class="page-hero-content">
+            <div class="title-container">
+                <div class="title-glow"></div>
+                <h1 class="page-hero-title minecraft">KOSZYK</h1>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Content -->
+    <main class="cart-container" id="cartContainer">
+        <div class="loading"></div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <span class="footer-logo minecraft">MP RECORDS</span>
+                <div class="footer-links">
+                    <a href="/wydania">WYDANIA</a>
+                    <a href="/sklep">SKLEP</a>
+                    <a href="/kontakt">KONTAKT</a>
+                    <a href="/czlonkowie">CZŁONKOWIE</a>
+                </div>
+                <span class="footer-year">© 2026</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/utils/api.js"></script>
+    <script>
+        let cart = [];
+        let productsStock = {}; // Cache stanów magazynowych
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadCart();
+        });
+        
+        async function loadCart() {
+            cart = JSON.parse(localStorage.getItem('mprecords_cart') || '[]');
+            
+            // Pobierz aktualne stany magazynowe dla produktów w koszyku
+            await refreshStockData();
+            
+            renderCart();
+            updateCartCount();
+        }
+        
+        async function refreshStockData() {
+            const productIds = [...new Set(cart.map(item => item.produktId))];
+            
+            for (const id of productIds) {
+                try {
+                    const response = await ProduktyAPI.getById(id);
+                    if (response.data) {
+                        productsStock[id] = response.data;
+                    }
+                } catch (err) {
+                    console.warn('Nie udało się pobrać produktu:', id);
+                }
+            }
+        }
+        
+        function getItemMaxStock(item) {
+            const product = productsStock[item.produktId];
+            if (!product) return item.maxStock || 10;
+            
+            if (product.rozmiary?.length > 0 && item.rozmiar) {
+                const sizeData = product.rozmiary.find(r => r.nazwa === item.rozmiar);
+                return sizeData ? sizeData.stan : 0;
+            }
+            return product.stanMagazynowy || 0;
+        }
+        
+        function renderCart() {
+            const container = document.getElementById('cartContainer');
+            
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-cart">
+                        <div class="empty-cart-icon">🛒</div>
+                        <p>Twój koszyk jest pusty</p>
+                        <a href="/sklep" class="btn">PRZEJDŹ DO SKLEPU</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            const subtotal = cart.reduce((sum, item) => sum + (item.cena * item.ilosc), 0);
+            const shipping = subtotal >= 200 ? 0 : 15;
+            const total = subtotal + shipping;
+            
+            container.innerHTML = `
+                <h2 class="cart-title">TWOJE PRODUKTY (${cart.length})</h2>
+                
+                <div class="cart-items">
+                    ${cart.map((item, index) => {
+                        const maxStock = getItemMaxStock(item);
+                        const stockWarning = item.ilosc >= maxStock;
+                        return `
+                        <div class="cart-item" data-index="${index}">
+                            <div class="cart-item-image">
+                                <a href="/produkt?id=${item.produktId}">
+                                    <img src="${item.zdjecie || '/assets/image/placeholder.png'}" alt="${item.nazwa}">
+                                </a>
+                            </div>
+                            <div class="cart-item-info">
+                                <a href="/produkt?id=${item.produktId}" class="cart-item-name">${item.nazwa}</a>
+                                ${item.rozmiar ? `<span class="cart-item-size">Rozmiar: ${item.rozmiar}</span>` : ''}
+                                <span class="cart-item-price">${item.cena?.toFixed(2)} PLN</span>
+                                ${stockWarning ? `<span style="font-size: 0.75rem; color: #f59e0b;">Maks. ${maxStock} szt.</span>` : ''}
+                            </div>
+                            <div class="cart-item-actions">
+                                <div class="quantity-controls">
+                                    <button class="qty-btn" onclick="updateQuantity(${index}, -1)">−</button>
+                                    <span class="qty-value">${item.ilosc}</span>
+                                    <button class="qty-btn" onclick="updateQuantity(${index}, 1)" ${item.ilosc >= maxStock ? 'disabled style="opacity:0.3;cursor:not-allowed"' : ''}>+</button>
+                                </div>
+                                <button class="remove-btn" onclick="removeItem(${index})">Usuń</button>
+                            </div>
+                        </div>
+                    `}).join('')}
+                </div>
+                
+                <div class="cart-summary">
+                    <h3 class="summary-title">PODSUMOWANIE</h3>
+                    
+                    <div class="summary-row">
+                        <span class="summary-label">Produkty</span>
+                        <span class="summary-value">${subtotal.toFixed(2)} PLN</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span class="summary-label">Wysyłka</span>
+                        <span class="summary-value">${shipping === 0 ? 'GRATIS' : shipping.toFixed(2) + ' PLN'}</span>
+                    </div>
+                    
+                    ${shipping > 0 && subtotal < 200 ? `
+                        <p class="free-shipping-note">
+                            Dodaj jeszcze ${(200 - subtotal).toFixed(2)} PLN do darmowej wysyłki!
+                        </p>
+                    ` : ''}
+                    
+                    <div class="summary-row total">
+                        <span>RAZEM</span>
+                        <span>${total.toFixed(2)} PLN</span>
+                    </div>
+                    
+                    <button class="checkout-btn" onclick="goToCheckout()">
+                        PRZEJDŹ DO ZAMÓWIENIA
+                    </button>
+                    
+                    <a href="/sklep" class="continue-shopping">← Kontynuuj zakupy</a>
+                </div>
+            `;
+        }
+        
+        function updateQuantity(index, change) {
+            const item = cart[index];
+            const newQty = item.ilosc + change;
+            
+            if (newQty <= 0) {
+                cart.splice(index, 1);
+            } else {
+                // Sprawdź stan magazynowy
+                const maxStock = getItemMaxStock(item);
+                
+                if (newQty > maxStock) {
+                    showCartToast(`Maksymalna dostępna ilość: ${maxStock}`);
+                    return;
+                }
+                
+                cart[index].ilosc = newQty;
+            }
+            
+            saveCart();
+            renderCart();
+        }
+        
+        function showCartToast(message) {
+            // Prosta notyfikacja
+            const existing = document.querySelector('.cart-toast');
+            if (existing) existing.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = 'cart-toast';
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(239, 68, 68, 0.9);
+                color: white;
+                padding: 12px 24px;
+                border-radius: 8px;
+                z-index: 9999;
+                font-size: 0.9rem;
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        function removeItem(index) {
+            cart.splice(index, 1);
+            saveCart();
+            renderCart();
+        }
+        
+        function saveCart() {
+            localStorage.setItem('mprecords_cart', JSON.stringify(cart));
+            updateCartCount();
+        }
+        
+        function updateCartCount() {
+            const count = cart.reduce((sum, item) => sum + item.ilosc, 0);
+            document.getElementById('cartCount').textContent = count;
+        }
+        
+        function goToCheckout() {
+            window.location.href = '/zamowienie';
+        }
+    </script>
+    <script src="/js/main.js"></script>
+</body>
+</html>

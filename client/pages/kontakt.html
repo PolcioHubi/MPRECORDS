@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kontakt - MP RECORDS</title>
+    <link rel="icon" href="/assets/image/favicon.svg" type="image/svg+xml">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/pages/common.css">
+    
+    <style>
+        .contact-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Social Links Section */
+        .social-section {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+        
+        .social-title {
+            font-family: var(--font-minecraft);
+            font-size: 0.8rem;
+            color: var(--white);
+            margin-bottom: 40px;
+            letter-spacing: 0.1em;
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .social-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 30px 40px;
+            background: rgba(124, 58, 237, 0.1);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 16px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            min-width: 140px;
+        }
+        
+        .social-link:hover {
+            background: rgba(124, 58, 237, 0.2);
+            border-color: var(--purple);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.3);
+        }
+        
+        .social-link svg {
+            width: 48px;
+            height: 48px;
+            transition: transform 0.3s ease;
+        }
+        
+        .social-link:hover svg {
+            transform: scale(1.1);
+        }
+        
+        .social-link.instagram svg { fill: #E4405F; }
+        .social-link.spotify svg { fill: #1DB954; }
+        .social-link.youtube svg { fill: #FF0000; }
+        .social-link.tiktok svg { fill: #ffffff; }
+        
+        .social-link span {
+            color: var(--white);
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+        
+        /* Contact Form Section */
+        .contact-section {
+            background: rgba(124, 58, 237, 0.05);
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            border-radius: 20px;
+            padding: 50px 40px;
+        }
+        
+        .contact-title {
+            font-family: var(--font-minecraft);
+            font-size: 0.8rem;
+            color: var(--white);
+            text-align: center;
+            margin-bottom: 15px;
+            letter-spacing: 0.1em;
+        }
+        
+        .contact-subtitle {
+            text-align: center;
+            color: var(--gray);
+            margin-bottom: 40px;
+            font-size: 0.9rem;
+        }
+        
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-group label {
+            color: var(--gray);
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 10px;
+            padding: 15px 18px;
+            color: var(--white);
+            font-size: 1rem;
+            font-family: var(--font-main);
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--purple);
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.2);
+        }
+        
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, var(--purple), var(--purple-light));
+            border: none;
+            border-radius: 10px;
+            padding: 18px 40px;
+            color: var(--white);
+            font-family: var(--font-minecraft);
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Success/Error Messages */
+        .form-message {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            display: none;
+        }
+        
+        .form-message.success {
+            background: rgba(29, 185, 84, 0.2);
+            border: 1px solid rgba(29, 185, 84, 0.5);
+            color: #1DB954;
+            display: block;
+        }
+        
+        .form-message.error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #ef4444;
+            display: block;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .contact-container {
+                padding: 0 15px;
+            }
+            
+            .social-links {
+                gap: 15px;
+            }
+            
+            .social-link {
+                padding: 20px 25px;
+                min-width: 100px;
+            }
+            
+            .social-link svg {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .social-link span {
+                font-size: 0.75rem;
+            }
+            
+            .contact-section {
+                padding: 30px 20px;
+            }
+            
+            .contact-title {
+                font-size: 0.7rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .social-links {
+                gap: 10px;
+            }
+            
+            .social-link {
+                padding: 15px 20px;
+                min-width: 80px;
+            }
+            
+            .social-link svg {
+                width: 30px;
+                height: 30px;
+            }
+            
+            .social-link span {
+                font-size: 0.65rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Marquee Banner -->
+    <div class="marquee-banner" id="marqueeBanner" style="display: none;">
+        <div class="marquee-track">
+            <span id="marqueeText1"></span>
+            <span id="marqueeText2"></span>
+        </div>
+    </div>
+
+    <!-- Particles Canvas -->
+    <canvas id="particles-canvas"></canvas>
+    
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <a href="/" class="logo">
+                <span class="logo-dot"></span>
+                <span class="logo-text minecraft">MP RECORDS</span>
+            </a>
+            <nav class="nav">
+                <a href="/wydania">WYDANIA</a>
+                <a href="/sklep">SKLEP</a>
+                <a href="/kontakt" class="active">KONTAKT</a>
+                <a href="/czlonkowie">CZŁONKOWIE</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="page-hero">
+        <div class="page-hero-bg" style="background-image: url('/assets/image/fajne zdjecie wo wyglud.jpg');"></div>
+        <div class="page-hero-overlay"></div>
+        <div class="page-hero-content">
+            <div class="title-container">
+                <div class="title-glow"></div>
+                <h1 class="page-hero-title minecraft">KONTAKT</h1>
+            </div>
+            <p class="page-hero-subtitle">SOCIAL MEDIA & WSPÓŁPRACA</p>
+        </div>
+    </section>
+
+    <!-- Page Content -->
+    <main class="page-content">
+        <div class="contact-container">
+            
+            <!-- Social Media Links -->
+            <section class="social-section">
+                <h2 class="social-title">OBSERWUJ NAS</h2>
+                <div class="social-links" id="socialLinks">
+                    <!-- Filled dynamically from settings -->
+                </div>
+            </section>
+            
+            <!-- Contact Form -->
+            <section class="contact-section">
+                <h2 class="contact-title">NAPISZ DO NAS</h2>
+                <p class="contact-subtitle">Masz pytanie? Chcesz współpracować? Napisz!</p>
+                
+                <form class="contact-form" id="contactForm">
+                    <div class="form-group">
+                        <label>TWÓJ EMAIL</label>
+                        <input type="email" name="email" placeholder="twoj@email.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>TEMAT</label>
+                        <input type="text" name="temat" placeholder="np. Współpraca, Pytanie...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>WIADOMOŚĆ</label>
+                        <textarea name="tresc" placeholder="Napisz swoją wiadomość..." required></textarea>
+                    </div>
+                    
+                    <div class="form-message" id="formMessage"></div>
+                    
+                    <button type="submit" class="submit-btn">WYŚLIJ WIADOMOŚĆ</button>
+                </form>
+            </section>
+            
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <span class="footer-logo minecraft">MP RECORDS</span>
+                <div class="footer-links">
+                    <a href="/wydania">WYDANIA</a>
+                    <a href="/sklep">SKLEP</a>
+                    <a href="/kontakt">KONTAKT</a>
+                    <a href="/czlonkowie">CZŁONKOWIE</a>
+                </div>
+                <span class="footer-year">© 2026</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/utils/api.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Load social links from settings
+            await loadSocialLinks();
+            
+            // Setup contact form
+            setupContactForm();
+        });
+        
+        async function loadSocialLinks() {
+            const container = document.getElementById('socialLinks');
+            
+            try {
+                const response = await fetch('/api/ustawienia');
+                const settings = await response.json();
+                const social = settings.socialMedia || {};
+                
+                let html = '';
+                
+                if (social.instagram) {
+                    html += `
+                        <a href="${social.instagram}" class="social-link instagram" target="_blank">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                            <span>INSTAGRAM</span>
+                        </a>
+                    `;
+                }
+                
+                if (social.spotify) {
+                    html += `
+                        <a href="${social.spotify}" class="social-link spotify" target="_blank">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                            </svg>
+                            <span>SPOTIFY</span>
+                        </a>
+                    `;
+                }
+                
+                if (social.youtube) {
+                    html += `
+                        <a href="${social.youtube}" class="social-link youtube" target="_blank">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                            </svg>
+                            <span>YOUTUBE</span>
+                        </a>
+                    `;
+                }
+                
+                if (social.tiktok) {
+                    html += `
+                        <a href="${social.tiktok}" class="social-link tiktok" target="_blank">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
+                            </svg>
+                            <span>TIKTOK</span>
+                        </a>
+                    `;
+                }
+                
+                if (!html) {
+                    html = '<p style="color: var(--gray);">Brak linków social media</p>';
+                }
+                
+                container.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error loading social links:', error);
+                container.innerHTML = '<p style="color: var(--gray);">Nie udało się załadować linków</p>';
+            }
+        }
+        
+        function setupContactForm() {
+            const form = document.getElementById('contactForm');
+            const message = document.getElementById('formMessage');
+            
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const submitBtn = form.querySelector('.submit-btn');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'WYSYŁANIE...';
+                submitBtn.disabled = true;
+                
+                const formData = new FormData(form);
+                const data = {
+                    email: formData.get('email'),
+                    temat: formData.get('temat') || 'Kontakt',
+                    tresc: formData.get('tresc')
+                };
+                
+                try {
+                    const response = await fetch('/api/kontakt', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        message.textContent = '✓ Wiadomość wysłana! Odezwiemy się wkrótce.';
+                        message.className = 'form-message success';
+                        form.reset();
+                    } else {
+                        throw new Error(result.message);
+                    }
+                    
+                } catch (error) {
+                    message.textContent = '✗ ' + (error.message || 'Błąd wysyłania. Spróbuj ponownie.');
+                    message.className = 'form-message error';
+                }
+                
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                
+                // Hide message after 5 seconds
+                setTimeout(() => {
+                    message.className = 'form-message';
+                }, 5000);
+            });
+        }
+    </script>
+    <script src="/js/main.js"></script>
+</body>
+</html>

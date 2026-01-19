@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MP RECORDS</title>
+    <link rel="icon" href="/assets/image/favicon.svg" type="image/svg+xml">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/sections/hero.css">
+    <link rel="stylesheet" href="/css/sections/carousel.css">
+    <link rel="stylesheet" href="/css/sections/navigation.css">
+</head>
+<body>
+    <!-- Marquee Banner -->
+    <div class="marquee-banner" id="marqueeBanner" style="display: none;">
+        <div class="marquee-track">
+            <span id="marqueeText1"></span>
+            <span id="marqueeText2"></span>
+        </div>
+    </div>
+
+    <!-- Particles Canvas -->
+    <canvas id="particles-canvas"></canvas>
+    
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+    
+    <!-- ==================== -->
+    <!-- HEADER -->
+    <!-- ==================== -->
+    <header class="header">
+        <div class="container">
+            <a href="/" class="logo">
+                <span class="logo-dot"></span>
+                <span class="logo-text minecraft">MP RECORDS</span>
+            </a>
+            <nav class="nav">
+                <a href="/wydania">WYDANIA</a>
+                <a href="/sklep">SKLEP</a>
+                <a href="/kontakt">KONTAKT</a>
+                <a href="/czlonkowie">CZŁONKOWIE</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ==================== -->
+    <!-- HERO SECTION -->
+    <!-- ==================== -->
+    <section class="hero" id="hero">
+        <div class="hero-overlay"></div>
+        <video class="hero-video" autoplay loop playsinline>
+            <source src="/assets/wideo/fajny filmik .mov" type="video/mp4">
+        </video>
+        <div class="hero-content">
+            <div class="title-container">
+                <div class="title-glow"></div>
+                <h1 class="hero-title minecraft" id="heroHeadline">MP RECORDS</h1>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </section>
+
+    <!-- ==================== -->
+    <!-- RELEASES CAROUSEL -->
+    <!-- ==================== -->
+    <section class="gallery" id="releases">
+        <div class="gallery-header">
+            <h2 class="gallery-title minecraft">WYDANIA</h2>
+        </div>
+        
+        <div class="carousel-container">
+            <button class="carousel-btn carousel-prev" id="carouselPrev" aria-label="Poprzednie">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6"></path>
+                </svg>
+            </button>
+            
+            <div class="carousel-track-container">
+                <div class="carousel-track" id="carouselTrack">
+                    <!-- Releases will be loaded dynamically from API -->
+                </div>
+            </div>
+            
+            <button class="carousel-btn carousel-next" id="carouselNext" aria-label="Następne">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="carousel-dots" id="carouselDots"></div>
+        
+        <div class="section-link-container">
+            <a href="/wydania" class="section-link">ZOBACZ WSZYSTKIE →</a>
+        </div>
+    </section>
+
+    <!-- ==================== -->
+    <!-- MEMBERS CAROUSEL -->
+    <!-- ==================== -->
+    <section class="members-section" id="membersPreview">
+        <div class="gallery-header">
+            <h2 class="gallery-title minecraft">CZŁONKOWIE</h2>
+        </div>
+        
+        <div class="carousel-container">
+            <button class="carousel-btn carousel-prev" id="membersPrev" aria-label="Poprzedni">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6"></path>
+                </svg>
+            </button>
+            
+            <div class="carousel-track-container">
+                <div class="carousel-track" id="membersTrack">
+                    <!-- Members will be loaded dynamically from API -->
+                </div>
+            </div>
+            
+            <button class="carousel-btn carousel-next" id="membersNext" aria-label="Następny">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="carousel-dots" id="membersDots"></div>
+        
+        <div class="section-link-container">
+            <a href="/czlonkowie" class="section-link">POZNAJ WSZYSTKICH →</a>
+        </div>
+    </section>
+
+    <!-- ==================== -->
+    <!-- LIGHTBOX -->
+    <!-- ==================== -->
+    <div class="lightbox" id="lightbox">
+        <div class="lightbox-backdrop"></div>
+        <button class="lightbox-close" aria-label="Zamknij">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12"></path>
+            </svg>
+        </button>
+        <button class="lightbox-nav lightbox-prev" aria-label="Poprzednie">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 18l-6-6 6-6"></path>
+            </svg>
+        </button>
+        <button class="lightbox-nav lightbox-next" aria-label="Następne">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 18l6-6-6-6"></path>
+            </svg>
+        </button>
+        <div class="lightbox-content">
+            <img class="lightbox-img" src="" alt="">
+        </div>
+    </div>
+
+    <!-- ==================== -->
+    <!-- MINI PLAYER -->
+    <!-- ==================== -->
+    <div class="mini-player" id="miniPlayer">
+        <div class="mini-player-content">
+            <img class="mini-player-cover" id="playerCover" src="" alt="">
+            <div class="mini-player-info">
+                <div class="mini-player-title" id="playerTitle">-</div>
+                <div class="mini-player-artist" id="playerArtist">-</div>
+            </div>
+            <div class="mini-player-controls">
+                <button class="mini-player-btn" id="playerPlayBtn" aria-label="Play/Pause">
+                    <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                    <svg class="pause-icon" style="display:none" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="mini-player-progress">
+                <span class="mini-player-time" id="playerCurrentTime">0:00</span>
+                <div class="mini-player-bar" id="playerBar">
+                    <div class="mini-player-bar-fill" id="playerBarFill"></div>
+                </div>
+                <span class="mini-player-time" id="playerDuration">0:00</span>
+            </div>
+            <div class="mini-player-volume">
+                <button class="mini-player-volume-btn" id="playerVolumeBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                    </svg>
+                </button>
+                <input type="range" class="mini-player-volume-slider" id="playerVolume" min="0" max="1" step="0.1" value="0.7">
+            </div>
+            <button class="mini-player-close" id="playerClose" aria-label="Zamknij">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <audio id="audioPlayer"></audio>
+    </div>
+
+    <!-- ==================== -->
+    <!-- FOOTER -->
+    <!-- ==================== -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <span class="footer-logo minecraft">MP RECORDS</span>
+                <span class="footer-year">© 2026</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Spotify Loading Overlay -->
+    <div id="spotifyLoader" class="spotify-loader">
+        <div class="spotify-loader-content">
+            <div class="spotify-logo">
+                <svg viewBox="0 0 24 24" width="80" height="80">
+                    <path fill="#1DB954" d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                </svg>
+            </div>
+            <p class="spotify-loader-text">Przekierowuję na Spotify...</p>
+            <div class="spotify-loader-bar">
+                <div class="spotify-loader-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/utils/api.js"></script>
+    <script src="/js/components/carousel.js"></script>
+    <script src="/js/components/navigation.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+</html>

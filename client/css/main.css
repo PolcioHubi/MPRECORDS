@@ -1,0 +1,1086 @@
+/* ═══════════════════════════════════════════════════════════════
+   MPRECORDS - Main Stylesheet
+   Color Palette: Black & Purple
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Reset & Variables */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Colors */
+    --black: #000000;
+    --black-light: #0a0a0a;
+    --black-lighter: #121212;
+    --purple-dark: #4c1d95;
+    --purple: #7c3aed;
+    --purple-light: #a78bfa;
+    --purple-glow: rgba(124, 58, 237, 0.5);
+    --purple-electric: #bf7fff;
+    --white: #ffffff;
+    --gray: #71717a;
+    
+    /* Typography */
+    --font-main: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-minecraft: 'Press Start 2P', cursive;
+    
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+    --transition-medium: 0.4s ease;
+    --transition-slow: 0.6s ease;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--black);
+    color: var(--white);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CUSTOM CURSOR
+   ═══════════════════════════════════════════════════════════════ */
+
+body.custom-cursor {
+    cursor: none;
+}
+
+body.custom-cursor * {
+    cursor: none !important;
+}
+
+.cursor-dot {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    background: var(--purple);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease, background 0.2s ease;
+    box-shadow: 0 0 15px var(--purple), 0 0 30px var(--purple-glow);
+}
+
+.cursor-ring {
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--purple-light);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease-out, width 0.2s ease, height 0.2s ease, border-color 0.2s ease;
+    opacity: 0.6;
+}
+
+body.custom-cursor:hover .cursor-dot {
+    box-shadow: 0 0 20px var(--purple), 0 0 40px var(--purple-glow);
+}
+
+.cursor-dot.clicking {
+    transform: translate(-50%, -50%) scale(0.5);
+    background: var(--purple-light);
+}
+
+.cursor-ring.clicking {
+    transform: translate(-50%, -50%) scale(1.5);
+    border-color: var(--purple);
+}
+
+.cursor-dot.hovering {
+    width: 12px;
+    height: 12px;
+    background: var(--purple-light);
+}
+
+.cursor-ring.hovering {
+    width: 60px;
+    height: 60px;
+    border-color: var(--purple);
+    opacity: 0.8;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PARTICLES CANVAS
+   ═══════════════════════════════════════════════════════════════ */
+
+#particles-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.6;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* Minecraft Font */
+.minecraft {
+    font-family: var(--font-minecraft);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HEADER
+   ═══════════════════════════════════════════════════════════════ */
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    /* Bazowe przezroczyste tło */
+    background: transparent;
+    padding: 16px 0;
+    transition: padding 0.3s ease;
+}
+
+/* Pseudo-element dla animowanego tła headera */
+.header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: -1;
+    /* Domyślnie widoczne (po scrollu) - animacja od góry */
+    transform: translateY(0%);
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Na górze strony - tło headera chowa się do góry */
+.header.scrolled::before {
+    transform: translateY(-100%);
+}
+
+.header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--white);
+}
+
+.logo-dot {
+    width: 10px;
+    height: 10px;
+    background: var(--purple);
+    border-radius: 50%;
+    box-shadow: 0 0 20px var(--purple-glow);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.8; }
+}
+
+.logo-text {
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+}
+
+.nav {
+    display: flex;
+    gap: 40px;
+}
+
+.nav a {
+    position: relative;
+    color: var(--gray);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    transition: var(--transition-fast);
+}
+
+.nav a:hover {
+    color: var(--white);
+}
+
+.nav a::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--purple), var(--purple-light));
+    transition: var(--transition-medium);
+}
+
+.nav a:hover::after {
+    width: 100%;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TRANSITION SECTION
+   ═══════════════════════════════════════════════════════════════ */
+
+.transition-section {
+    position: relative;
+    height: 60vh;
+    overflow: hidden;
+}
+
+.transition-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
+.transition-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.95) 0%,
+        rgba(0, 0, 0, 0.2) 30%,
+        rgba(0, 0, 0, 0.2) 70%,
+        rgba(0, 0, 0, 0.98) 100%
+    );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GALLERY SECTION
+   ═══════════════════════════════════════════════════════════════ */
+
+.gallery,
+.members-section {
+    padding: 100px 0;
+    background: var(--black);
+}
+
+.gallery-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.gallery-title.minecraft {
+    font-size: clamp(0.8rem, 2vw, 1.5rem);
+    color: var(--white);
+    text-shadow: 0 0 30px var(--purple-glow);
+    letter-spacing: 0.2em;
+}
+
+/* Section Link */
+.section-link-container {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.section-link {
+    display: inline-block;
+    font-family: var(--font-minecraft);
+    font-size: 0.6rem;
+    color: var(--purple-light);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    padding: 16px 32px;
+    border: 1px solid var(--purple);
+    border-radius: 8px;
+    transition: var(--transition-fast);
+}
+
+.section-link:hover {
+    background: var(--purple);
+    color: var(--white);
+    box-shadow: 0 0 30px var(--purple-glow);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RELEASE BADGES
+   ═══════════════════════════════════════════════════════════════ */
+
+.card-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    padding: 6px 12px;
+    font-family: var(--font-minecraft);
+    font-size: 0.5rem;
+    border-radius: 4px;
+    z-index: 5;
+    animation: badgePulse 2s ease-in-out infinite;
+}
+
+.card-badge.nowosc {
+    background: linear-gradient(135deg, #00d4ff, #7c3aed);
+    color: var(--white);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+}
+
+.card-badge.hot {
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
+    color: var(--white);
+    box-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
+}
+
+.card-badge.polecane {
+    background: linear-gradient(135deg, #ffd700, #ffaa00);
+    color: var(--black);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+@keyframes badgePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MINI PLAYER
+   ═══════════════════════════════════════════════════════════════ */
+
+.mini-player {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.98), rgba(18, 18, 18, 0.95));
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(124, 58, 237, 0.3);
+    padding: 12px 24px;
+    z-index: 1000;
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mini-player.active {
+    transform: translateY(0);
+}
+
+.mini-player-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.mini-player-cover {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    object-fit: cover;
+    box-shadow: 0 0 20px var(--purple-glow);
+}
+
+.mini-player-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.mini-player-title {
+    font-family: var(--font-minecraft);
+    font-size: 0.5rem;
+    color: var(--purple-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mini-player-artist {
+    font-size: 0.75rem;
+    color: var(--gray);
+    margin-top: 2px;
+}
+
+.mini-player-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.mini-player-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--purple);
+    border: none;
+    color: var(--white);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+    box-shadow: 0 0 20px var(--purple-glow);
+}
+
+.mini-player-btn:hover {
+    background: var(--purple-light);
+    transform: scale(1.1);
+}
+
+.mini-player-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.mini-player-progress {
+    flex: 1;
+    max-width: 400px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.mini-player-time {
+    font-size: 0.7rem;
+    color: var(--gray);
+    font-variant-numeric: tabular-nums;
+    min-width: 40px;
+}
+
+.mini-player-bar {
+    flex: 1;
+    height: 4px;
+    background: rgba(124, 58, 237, 0.2);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+}
+
+.mini-player-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--purple), var(--purple-light));
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.1s linear;
+}
+
+.mini-player-bar:hover .mini-player-bar-fill {
+    box-shadow: 0 0 10px var(--purple-glow);
+}
+
+.mini-player-volume {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mini-player-volume-btn {
+    background: none;
+    border: none;
+    color: var(--gray);
+    cursor: pointer;
+    padding: 4px;
+    transition: var(--transition-fast);
+}
+
+.mini-player-volume-btn:hover {
+    color: var(--white);
+}
+
+.mini-player-volume-slider {
+    width: 80px;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(124, 58, 237, 0.2);
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.mini-player-volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    background: var(--purple);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--purple-glow);
+}
+
+.mini-player-close {
+    background: none;
+    border: none;
+    color: var(--gray);
+    cursor: pointer;
+    padding: 8px;
+    transition: var(--transition-fast);
+}
+
+.mini-player-close:hover {
+    color: var(--white);
+}
+
+/* Footer padding when player is active */
+body.player-active .footer {
+    padding-bottom: 100px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CAROUSEL
+   ═══════════════════════════════════════════════════════════════ */
+
+.carousel-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 0 60px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.carousel-track-container {
+    overflow: hidden;
+    width: 100%;
+}
+
+.carousel-track {
+    display: flex;
+    gap: 30px;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.carousel-card {
+    flex: 0 0 320px;
+    background: var(--black-lighter);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(124, 58, 237, 0.15);
+    transition: var(--transition-medium);
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(40px);
+}
+
+.carousel-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.carousel-card:hover {
+    transform: translateY(-12px);
+    border-color: var(--purple);
+    box-shadow: 
+        0 20px 60px rgba(124, 58, 237, 0.3),
+        0 0 40px rgba(124, 58, 237, 0.1);
+}
+
+.card-image {
+    position: relative;
+    height: 320px;
+    overflow: hidden;
+}
+
+.card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-slow);
+}
+
+.carousel-card:hover .card-image img {
+    transform: scale(1.1);
+}
+
+.card-content {
+    padding: 24px;
+    border-top: 0px solid rgba(124, 58, 237, 0.2);
+}
+
+.card-title {
+    font-family: var(--font-minecraft);
+    font-size: 0.55rem;
+    margin-bottom: 12px;
+    color: var(--purple-light);
+    line-height: 1.6;
+}
+
+.card-desc {
+    font-size: 0.9rem;
+    color: var(--gray);
+    margin-bottom: 16px;
+    line-height: 1.6;
+}
+
+.card-year {
+    display: inline-block;
+    font-size: 0.7rem;
+    color: var(--purple);
+    font-weight: 700;
+    padding: 4px 12px;
+    background: rgba(124, 58, 237, 0.15);
+    border-radius: 4px;
+}
+
+/* Carousel Navigation */
+.carousel-btn {
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(124, 58, 237, 0.15);
+    border: 1px solid rgba(124, 58, 237, 0.4);
+    color: var(--white);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+    z-index: 10;
+}
+
+.carousel-btn:hover {
+    background: var(--purple);
+    border-color: var(--purple);
+    box-shadow: 0 0 20px var(--purple-glow);
+}
+
+.carousel-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* Carousel Dots */
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 50px;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(124, 58, 237, 0.25);
+    border: none;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.dot:hover {
+    background: rgba(124, 58, 237, 0.5);
+}
+
+.dot.active {
+    background: var(--purple);
+    box-shadow: 0 0 20px var(--purple-glow);
+    transform: scale(1.2);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MEMBERS GRID
+   ═══════════════════════════════════════════════════════════════ */
+
+.members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* Empty members message */
+.empty-members-message {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--gray);
+}
+
+.empty-members-message .minecraft {
+    font-size: 0.8rem;
+    color: var(--purple-light);
+    margin-bottom: 16px;
+}
+
+.empty-members-message p {
+    font-size: 0.9rem;
+}
+
+.member-card {
+    background: var(--black-lighter);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(124, 58, 237, 0.15);
+    transition: var(--transition-medium);
+}
+
+.member-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--purple);
+    box-shadow: 0 20px 60px rgba(124, 58, 237, 0.2);
+}
+
+.member-image {
+    height: 300px;
+    overflow: hidden;
+}
+
+.member-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-slow);
+}
+
+.member-card:hover .member-image img {
+    transform: scale(1.1);
+}
+
+.member-info {
+    padding: 24px;
+    text-align: center;
+}
+
+.member-name {
+    font-family: var(--font-minecraft);
+    font-size: 0.6rem;
+    color: var(--purple-light);
+    margin-bottom: 8px;
+}
+
+.member-role {
+    font-size: 0.85rem;
+    color: var(--gray);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LIGHTBOX
+   ═══════════════════════════════════════════════════════════════ */
+
+.lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition-medium);
+}
+
+.lightbox.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.lightbox-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.96);
+}
+
+.lightbox-content {
+    position: relative;
+    z-index: 10;
+    max-width: 90vw;
+    max-height: 90vh;
+}
+
+.lightbox-img {
+    max-width: 100%;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 0 100px var(--purple-glow);
+    transform: scale(0.9);
+    opacity: 0;
+    transition: var(--transition-medium);
+}
+
+.lightbox.active .lightbox-img {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.lightbox-close,
+.lightbox-nav {
+    position: absolute;
+    z-index: 20;
+    background: rgba(124, 58, 237, 0.2);
+    border: 1px solid rgba(124, 58, 237, 0.4);
+    color: var(--white);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lightbox-close:hover,
+.lightbox-nav:hover {
+    background: var(--purple);
+    border-color: var(--purple);
+}
+
+.lightbox-close {
+    top: 30px;
+    right: 30px;
+}
+
+.lightbox-prev {
+    left: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.lightbox-next {
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════════════════════════ */
+
+.footer {
+    padding: 50px 0;
+    background: var(--black);
+    border-top: 1px solid rgba(124, 58, 237, 0.15);
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-logo.minecraft {
+    font-size: 0.5rem;
+    background: linear-gradient(90deg, var(--purple), var(--purple-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.footer-year {
+    color: var(--gray);
+    font-size: 0.875rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 1024px) {
+    .carousel-card {
+        flex: 0 0 280px;
+    }
+    
+    .card-image {
+        height: 280px;
+    }
+    
+    .carousel-container {
+        padding: 0 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header .container {
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .nav {
+        gap: 24px;
+    }
+    
+    .title-container {
+        padding: 40px 60px;
+    }
+    
+    .hero-title.minecraft {
+        font-size: clamp(1rem, 5vw, 2rem);
+    }
+    
+    .lightning {
+        width: 30px;
+        height: 80px;
+    }
+    
+    .transition-section {
+        height: 40vh;
+    }
+    
+    .carousel-container {
+        flex-direction: column;
+        padding: 0 20px;
+    }
+    
+    .carousel-track-container {
+        order: 1;
+    }
+    
+    .carousel-btn {
+        display: none;
+    }
+    
+    .carousel-card {
+        flex: 0 0 280px;
+    }
+    
+    .members-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-content {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo-text {
+        font-size: 0.5rem;
+    }
+    
+    .nav a {
+        font-size: 0.75rem;
+    }
+    
+    .gallery-title.minecraft {
+        font-size: 0.7rem;
+    }
+    
+    .carousel-card {
+        flex: 0 0 260px;
+    }
+    
+    .card-image {
+        height: 260px;
+    }
+    
+    .section-link {
+        font-size: 0.5rem;
+        padding: 12px 24px;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SPOTIFY LOADER
+   ═══════════════════════════════════════════════════════════════ */
+.spotify-loader {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.spotify-loader.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.spotify-loader-content {
+    text-align: center;
+}
+
+.spotify-logo {
+    animation: spotifyPulse 1s ease-in-out infinite;
+}
+
+.spotify-logo svg {
+    filter: drop-shadow(0 0 30px rgba(29, 185, 84, 0.6));
+}
+
+@keyframes spotifyPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.spotify-loader-text {
+    font-family: var(--font-minecraft);
+    font-size: 0.8rem;
+    color: #1DB954;
+    margin-top: 1.5rem;
+    letter-spacing: 0.1em;
+    animation: spotifyTextGlow 1.5s ease-in-out infinite;
+}
+
+@keyframes spotifyTextGlow {
+    0%, 100% { text-shadow: 0 0 10px rgba(29, 185, 84, 0.5); }
+    50% { text-shadow: 0 0 20px rgba(29, 185, 84, 0.8), 0 0 40px rgba(29, 185, 84, 0.4); }
+}
+
+.spotify-loader-bar {
+    width: 200px;
+    height: 4px;
+    background: rgba(29, 185, 84, 0.2);
+    border-radius: 2px;
+    margin: 1.5rem auto 0;
+    overflow: hidden;
+}
+
+.spotify-loader-progress {
+    width: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #1DB954, #1ed760);
+    border-radius: 2px;
+    animation: spotifyLoadingBar 1.5s ease-out forwards;
+}
+
+@keyframes spotifyLoadingBar {
+    0% { width: 0; }
+    100% { width: 100%; }
+}
+
+/* Spotify hover icon in carousel */
+.spotify-hover-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spotify-hover-icon svg {
+    filter: drop-shadow(0 0 15px rgba(29, 185, 84, 0.6));
+    transition: var(--transition-fast);
+}
+
+.carousel-item:hover .spotify-hover-icon svg {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 25px rgba(29, 185, 84, 0.8));
+}

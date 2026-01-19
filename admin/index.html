@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - MP RECORDS</title>
+    <link rel="icon" href="/assets/image/favicon.svg" type="image/svg+xml">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-container">
+            <h1 class="login-logo">MP RECORDS</h1>
+            <p class="login-subtitle">PANEL ADMINISTRACYJNY</p>
+            
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label for="username">UŻYTKOWNIK</label>
+                    <input type="text" id="username" name="username" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="password">HASŁO</label>
+                    <input type="password" id="password" name="password" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="login-btn">ZALOGUJ</button>
+                <p class="login-error" id="loginError"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div class="admin-dashboard" id="adminDashboard" style="display: none;">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="/" class="sidebar-logo">MPR</a>
+                <span class="sidebar-badge">ADMIN</span>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#dashboard" class="sidebar-link active" data-section="dashboard">
+                    <span class="sidebar-icon">📊</span>
+                    DASHBOARD
+                </a>
+                <a href="#wydania" class="sidebar-link" data-section="wydania">
+                    <span class="sidebar-icon">💿</span>
+                    WYDANIA
+                </a>
+                <a href="#produkty" class="sidebar-link" data-section="produkty">
+                    <span class="sidebar-icon">🛍️</span>
+                    PRODUKTY
+                </a>
+                <a href="#wiadomosci" class="sidebar-link" data-section="wiadomosci">
+                    <span class="sidebar-icon">📬</span>
+                    WIADOMOŚCI
+                </a>
+                <a href="#czlonkowie" class="sidebar-link" data-section="czlonkowie">
+                    <span class="sidebar-icon">👥</span>
+                    CZŁONKOWIE
+                </a>
+                <a href="#zamowienia" class="sidebar-link" data-section="zamowienia">
+                    <span class="sidebar-icon">📦</span>
+                    ZAMÓWIENIA
+                </a>
+                <a href="#ustawienia" class="sidebar-link" data-section="ustawienia">
+                    <span class="sidebar-icon">⚙️</span>
+                    USTAWIENIA
+                </a>
+                <a href="#backup" class="sidebar-link" data-section="backup">
+                    <span class="sidebar-icon">💾</span>
+                    BACKUP
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="logout-btn" id="logoutBtn">WYLOGUJ</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1 class="admin-title" id="pageTitle">DASHBOARD</h1>
+                <div class="admin-actions" id="pageActions"></div>
+            </header>
+            
+            <div class="admin-content" id="adminContent">
+                <!-- Content loaded dynamically -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div class="admin-modal" id="adminModal">
+        <div class="modal-content" id="modalContent">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Modal</h2>
+                <button class="modal-close" id="modalCloseBtn">×</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="/admin/js/api.js"></script>
+    <script src="/admin/js/auth.js"></script>
+    <script src="/admin/js/dashboard.js"></script>
+    <script src="/admin/js/crud/wydania.js"></script>
+    <script src="/admin/js/crud/produkty.js"></script>
+    <script src="/admin/js/crud/wiadomosci.js"></script>
+    <script src="/admin/js/crud/czlonkowie.js"></script>
+    <script src="/admin/js/crud/zamowienia.js"></script>
+    <script src="/admin/js/crud/ustawienia.js"></script>
+    <script src="/admin/js/crud/backup.js"></script>
+    <script src="/admin/js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wydania - MP RECORDS</title>
+    <link rel="icon" href="/assets/image/favicon.svg" type="image/svg+xml">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/pages/common.css">
+    
+    <style>
+        * { box-sizing: border-box; }
+        html, body { overflow-x: hidden; width: 100%; max-width: 100%; }
+        .page-content { padding: 40px 12px 80px; overflow: hidden; }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            width: 100%;
+            max-width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        .card {
+            width: 100%;
+            min-width: 0;
+            position: relative;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .card-image {
+            width: 100%;
+            background: #000;
+            overflow: hidden;
+            border-radius: 8px 8px 0 0;
+            display: block;
+            line-height: 0;
+        }
+        .card-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+            object-position: center;
+        }
+        .card-info { 
+            padding: 12px 12px 4px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 2;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 60%, transparent);
+            border-radius: 0 0 8px 8px;
+        }
+        .card-title { font-size: 0.5rem; margin-bottom: 2px; }
+        .card-artist { font-size: 0.7rem; margin-bottom: 2px; }
+        .card-year { font-size: 0.65rem; }
+        
+        .card-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 8px;
+            z-index: 3;
+        }
+        .card:hover .card-overlay { opacity: 1; }
+        .spotify-play-icon svg {
+            filter: drop-shadow(0 0 15px rgba(29, 185, 84, 0.6));
+            transition: transform 0.3s ease;
+        }
+        .card:hover .spotify-play-icon svg { transform: scale(1.1); }
+        
+        /* Desktop styles */
+        @media (min-width: 768px) {
+            .page-content { padding: 60px 40px 100px; }
+            .cards-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 24px;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            .card {
+                padding-bottom: 0;
+            }
+            .card-info {
+                position: relative;
+                z-index: 5;
+                padding: 5px 12px 6px;
+                background: #000;
+                border-radius: 0 0 8px 8px;
+                margin-top: -50px;
+            }
+            .card-title { font-size: 0.65rem; margin-bottom: 4px; }
+            .card-artist { font-size: 0.9rem; margin-bottom: 4px; }
+            .card-year { font-size: 0.8rem; }
+        }
+        
+        @media (min-width: 1024px) {
+            .cards-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Marquee Banner -->
+    <div class="marquee-banner" id="marqueeBanner" style="display: none;">
+        <div class="marquee-track">
+            <span id="marqueeText1"></span>
+            <span id="marqueeText2"></span>
+        </div>
+    </div>
+
+    <!-- Particles Canvas -->
+    <canvas id="particles-canvas"></canvas>
+    
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <a href="/" class="logo">
+                <span class="logo-dot"></span>
+                <span class="logo-text minecraft">MP RECORDS</span>
+            </a>
+            <nav class="nav">
+                <a href="/wydania" class="active">WYDANIA</a>
+                <a href="/sklep">SKLEP</a>
+                <a href="/kontakt">KONTAKT</a>
+                <a href="/czlonkowie">CZŁONKOWIE</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="page-hero">
+        <div class="page-hero-bg" style="background-image: url('/assets/image/fajne zdjecie wo wyglud.jpg');"></div>
+        <div class="page-hero-overlay"></div>
+        <div class="page-hero-content">
+            <div class="title-container">
+                <div class="title-glow"></div>
+                <h1 class="page-hero-title minecraft">WYDANIA</h1>
+            </div>
+            <p class="page-hero-subtitle">Wszystkie nasze produkcje muzyczne</p>
+        </div>
+    </section>
+
+    <!-- Content -->
+    <main class="page-content">
+        <div class="cards-grid" id="releasesGrid">
+            <div class="loading"></div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <span class="footer-logo minecraft">MP RECORDS</span>
+                <div class="footer-links">
+                    <a href="/wydania">WYDANIA</a>
+                    <a href="/sklep">SKLEP</a>
+                    <a href="/kontakt">KONTAKT</a>
+                    <a href="/czlonkowie">CZŁONKOWIE</a>
+                </div>
+                <span class="footer-year">© 2026</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Spotify Loading Overlay -->
+    <div id="spotifyLoader" class="spotify-loader">
+        <div class="spotify-loader-content">
+            <div class="spotify-logo">
+                <svg viewBox="0 0 24 24" width="80" height="80">
+                    <path fill="#1DB954" d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                </svg>
+            </div>
+            <p class="spotify-loader-text">Przekierowuję na Spotify...</p>
+            <div class="spotify-loader-bar">
+                <div class="spotify-loader-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/utils/api.js"></script>
+    <script src="/js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const grid = document.getElementById('releasesGrid');
+            const loader = document.getElementById('spotifyLoader');
+            
+            // Function to open Spotify with animation
+            function openSpotify(url) {
+                loader.classList.add('active');
+                
+                setTimeout(() => {
+                    window.open(url, '_blank');
+                    setTimeout(() => {
+                        loader.classList.remove('active');
+                    }, 500);
+                }, 1500);
+            }
+            
+            try {
+                const response = await WydaniaAPI.getAll();
+                const releases = response.data || [];
+                
+                if (releases.length === 0) {
+                    grid.innerHTML = `
+                        <div class="empty-state">
+                            <p>Brak wydań do wyświetlenia</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                grid.innerHTML = releases.map(release => `
+                    <div class="card release-card" data-spotify="${release.spotifyLink || ''}">
+                        <div class="card-image">
+                            <img src="${release.okladka || '/assets/image/placeholder.png'}" 
+                                 alt="${release.nazwa}"
+                                 loading="lazy">
+                            <div class="card-overlay">
+                                <div class="spotify-play-icon">
+                                    <svg viewBox="0 0 24 24" width="40" height="40">
+                                        <path fill="#1DB954" d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-info">
+                            <h2 class="card-title">${release.nazwa}</h2>
+                            <p class="card-artist">${release.autorzy || 'MP RECORDS'}</p>
+                            <span class="card-year">${release.rok || ''}</span>
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Add click listeners for cards
+                grid.querySelectorAll('.release-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const spotifyUrl = card.dataset.spotify;
+                        if (spotifyUrl) {
+                            openSpotify(spotifyUrl);
+                        }
+                    });
+                });
+                
+            } catch (error) {
+                console.error('Error:', error);
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <p>Nie udało się załadować wydań</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

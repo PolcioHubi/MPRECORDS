@@ -1,0 +1,304 @@
+/* ==================== */
+/* MAIN NAVIGATION */
+/* ==================== */
+.main-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: var(--spacing-md) 0;
+    background: transparent;
+    transition: var(--transition-normal);
+}
+
+.main-nav.scrolled {
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(10px);
+    padding: var(--spacing-sm) 0;
+}
+
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Logo */
+.nav-logo {
+    font-family: var(--font-minecraft);
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    transition: var(--transition-fast);
+}
+
+.nav-logo:hover {
+    opacity: 0.8;
+}
+
+/* Navigation Links */
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: var(--spacing-lg);
+}
+
+.nav-link {
+    font-family: var(--font-minecraft);
+    font-size: 0.625rem;
+    letter-spacing: 0.15em;
+    position: relative;
+    padding: var(--spacing-xs) 0;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--color-text);
+    transition: var(--transition-fast);
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+    width: 100%;
+}
+
+/* Mobile Menu Toggle */
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--spacing-xs);
+}
+
+.nav-toggle span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--color-text);
+    transition: var(--transition-fast);
+}
+
+.nav-toggle.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.nav-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.nav-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* ==================== */
+/* MEMBERS PREVIEW */
+/* ==================== */
+.members-preview {
+    padding: var(--spacing-xl) 0;
+    background: var(--color-bg-secondary);
+}
+
+.members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-md);
+    padding: 0 var(--spacing-md);
+}
+
+.member-card {
+    position: relative;
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--color-bg-tertiary);
+}
+
+.member-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition-slow);
+}
+
+.member-card:hover img {
+    transform: scale(1.05);
+}
+
+.member-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.9) 0%,
+        transparent 60%
+    );
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: var(--spacing-md);
+    transition: var(--transition-normal);
+}
+
+.member-card:hover .member-card-overlay {
+    background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.95) 0%,
+        rgba(0, 0, 0, 0.3) 100%
+    );
+}
+
+.member-card-name {
+    font-family: var(--font-minecraft);
+    font-size: 0.875rem;
+    margin-bottom: var(--spacing-xs);
+}
+
+.member-card-role {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+/* ==================== */
+/* FOOTER */
+/* ==================== */
+.main-footer {
+    background: var(--color-bg);
+    border-top: 1px solid var(--color-border);
+    padding: var(--spacing-xl) 0 var(--spacing-lg);
+}
+
+.footer-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+    text-align: center;
+}
+
+.footer-logo {
+    font-family: var(--font-minecraft);
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-lg);
+    letter-spacing: 0.1em;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-md) var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.footer-links a {
+    font-family: var(--font-minecraft);
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    color: var(--color-text-secondary);
+    transition: var(--transition-fast);
+}
+
+.footer-links a:hover {
+    color: var(--color-text);
+}
+
+.footer-social {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.footer-social a {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-border);
+    transition: var(--transition-fast);
+}
+
+.footer-social a:hover {
+    border-color: var(--color-text);
+    background: var(--color-text);
+    color: var(--color-bg);
+}
+
+.footer-social svg {
+    width: 20px;
+    height: 20px;
+}
+
+.footer-copy {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    letter-spacing: 0.05em;
+}
+
+/* ==================== */
+/* RESPONSIVE */
+/* ==================== */
+@media (max-width: 768px) {
+    .nav-toggle {
+        display: flex;
+    }
+    
+    .nav-links {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.98);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: var(--spacing-lg);
+        opacity: 0;
+        visibility: hidden;
+        transition: var(--transition-normal);
+    }
+    
+    .nav-links.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .nav-link {
+        font-size: 1rem;
+    }
+    
+    .members-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-sm);
+    }
+    
+    .member-card {
+        aspect-ratio: 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .members-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-links {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+}

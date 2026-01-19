@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sklep - MP RECORDS</title>
+    <link rel="icon" href="/assets/image/favicon.svg" type="image/svg+xml">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/pages/common.css">
+</head>
+<body>
+    <!-- Marquee Banner -->
+    <div class="marquee-banner" id="marqueeBanner" style="display: none;">
+        <div class="marquee-track">
+            <span id="marqueeText1"></span>
+            <span id="marqueeText2"></span>
+        </div>
+    </div>
+
+    <!-- Particles Canvas -->
+    <canvas id="particles-canvas"></canvas>
+    
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <a href="/" class="logo">
+                <span class="logo-dot"></span>
+                <span class="logo-text minecraft">MP RECORDS</span>
+            </a>
+            <nav class="nav">
+                <a href="/wydania">WYDANIA</a>
+                <a href="/sklep" class="active">SKLEP</a>
+                <a href="/kontakt">KONTAKT</a>
+                <a href="/czlonkowie">CZŁONKOWIE</a>
+                <a href="/koszyk" class="cart-link" title="Koszyk">
+                    🛒 <span class="cart-count" id="cartCount">0</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="page-hero">
+        <div class="page-hero-bg" style="background-image: url('/assets/image/fajne zdjecie wo wyglud.jpg');"></div>
+        <div class="page-hero-overlay"></div>
+        <div class="page-hero-content">
+            <div class="title-container">
+                <div class="title-glow"></div>
+                <h1 class="page-hero-title minecraft">SKLEP</h1>
+            </div>
+            <p class="page-hero-subtitle">Oficjalny merch MP RECORDS</p>
+        </div>
+    </section>
+
+    <!-- Content -->
+    <main class="page-content">
+        <!-- Filters -->
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all">WSZYSTKO</button>
+            <button class="filter-btn" data-filter="odziez">ODZIEŻ</button>
+            <button class="filter-btn" data-filter="akcesoria">AKCESORIA</button>
+            <button class="filter-btn" data-filter="muzyka">MUZYKA</button>
+        </div>
+        
+        <div class="cards-grid" id="productsGrid">
+            <div class="loading"></div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <span class="footer-logo minecraft">MP RECORDS</span>
+                <div class="footer-links">
+                    <a href="/wydania">WYDANIA</a>
+                    <a href="/sklep">SKLEP</a>
+                    <a href="/kontakt">KONTAKT</a>
+                    <a href="/czlonkowie">CZŁONKOWIE</a>
+                </div>
+                <span class="footer-year">© 2026</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/utils/api.js"></script>
+    <script>
+        let allProducts = [];
+        
+        // Update cart count
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('mprecords_cart') || '[]');
+            const count = cart.reduce((sum, item) => sum + item.ilosc, 0);
+            const countEl = document.getElementById('cartCount');
+            if (countEl) {
+                countEl.textContent = count;
+                countEl.dataset.count = count;
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            const grid = document.getElementById('productsGrid');
+            updateCartCount();
+            
+            try {
+                const response = await ProduktyAPI.getAll();
+                allProducts = response.data || [];
+                
+                // Validate cart - remove products that no longer exist
+                validateCart(allProducts);
+                
+                renderProducts(allProducts);
+                setupFilters();
+            } catch (error) {
+                console.error('Error:', error);
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <p>Nie udało się załadować produktów</p>
+                    </div>
+                `;
+            }
+        });
+        
+        function renderProducts(products) {
+            const grid = document.getElementById('productsGrid');
+            
+            if (products.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <p>Brak produktów do wyświetlenia</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = products.map(product => `
+                <a href="/produkt?id=${product._id}" class="card" data-category="${product.kategoria || 'inne'}">
+                    <div class="card-image">
+                        <img src="${product.zdjecia?.[0] || '/assets/image/placeholder.png'}" 
+                             alt="${product.nazwa}"
+                             loading="lazy">
+                    </div>
+                    <div class="card-content">
+                        <h2 class="card-title">${product.nazwa}</h2>
+                        <p class="card-desc">${product.opis || ''}</p>
+                        <div class="card-meta">
+                            <span class="card-price">${product.cena ? product.cena.toFixed(2) + ' PLN' : ''}</span>
+                        </div>
+                    </div>
+                </a>
+            `).join('');
+        }
+        
+        function setupFilters() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    const filter = btn.dataset.filter;
+                    
+                    if (filter === 'all') {
+                        renderProducts(allProducts);
+                    } else {
+                        const filtered = allProducts.filter(p => p.kategoria === filter);
+                        renderProducts(filtered);
+                    }
+                });
+            });
+        }
+        
+        // Validate cart - remove products that no longer exist
+        function validateCart(availableProducts) {
+            const cart = JSON.parse(localStorage.getItem('mprecords_cart') || '[]');
+            const productIds = availableProducts.map(p => p._id);
+            const validCart = cart.filter(item => productIds.includes(item.produktId));
+            
+            if (validCart.length !== cart.length) {
+                localStorage.setItem('mprecords_cart', JSON.stringify(validCart));
+                updateCartCount();
+            }
+        }
+    </script>
+    <script src="/js/main.js"></script>
+</body>
+</html>
